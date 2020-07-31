@@ -9,7 +9,7 @@ import Upload from '../../components/Upload';
 
 import { Container, Title, ImportFileContainer, Footer } from './styles';
 
-import alert from '../../assets/alert.svg';
+import alertSvg from '../../assets/alert.svg';
 import api from '../../services/api';
 
 interface FileProps {
@@ -23,19 +23,28 @@ const Import: React.FC = () => {
   const history = useHistory();
 
   async function handleUpload(): Promise<void> {
-    // const data = new FormData();
+    const data = new FormData();
 
-    // TODO
+    if (!uploadedFiles.length) return;
+
+    const file = uploadedFiles[0];
+    data.append('file', file.file, file.name);
 
     try {
-      // await api.post('/transactions/import', data);
+      await api.post('/transactions/import', data);
+      history.push('/');
     } catch (err) {
-      // console.log(err.response.error);
+      console.error(err.response.error);
     }
   }
 
   function submitFile(files: File[]): void {
-    // TODO
+    const formattedFiles = files.map(file => ({
+      file,
+      name: file.name,
+      readableSize: filesize(file.size),
+    }));
+    setUploadedFiles(formattedFiles);
   }
 
   return (
@@ -49,7 +58,7 @@ const Import: React.FC = () => {
 
           <Footer>
             <p>
-              <img src={alert} alt="Alert" />
+              <img src={alertSvg} alt="Alert" />
               Permitido apenas arquivos CSV
             </p>
             <button onClick={handleUpload} type="button">
